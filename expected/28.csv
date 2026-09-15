@@ -1,0 +1,21 @@
+customer_id,full_name,segment,orders,first_order,last_order,revenue,margin_pct,days_since_last_order,rank_in_segment
+107,Dian Pratama,corporate,15,2025-04-18,2026-04-16,331564000,28.9,75,1
+66,Umar Hartono,corporate,11,2025-04-01,2026-04-17,283728000,28.8,74,2
+83,Elang Halim,reseller,20,2025-01-20,2026-05-18,262332000,26.5,43,1
+252,Kevin Mahendra,corporate,11,2025-05-16,2026-05-08,258751000,28.9,53,3
+54,Eka Hartono,reseller,14,2025-03-31,2026-06-17,255458000,24.3,13,2
+31,Jasmine Lestari,corporate,12,2025-01-07,2026-06-06,243786000,27.4,24,4
+44,Tari Mahendra,corporate,9,2025-05-06,2026-06-29,231453000,29.2,1,5
+135,Sinta Setiawan,corporate,12,2025-05-28,2026-05-22,222372000,28.4,39,6
+195,Putri Halim,corporate,9,2025-12-03,2026-06-29,222189000,26.0,1,7
+228,Kirana Ardiansyah,reseller,16,2025-03-10,2026-06-13,221959000,30.3,17,3
+25,Putri Rahmawati,reseller,12,2025-03-17,2026-06-10,213084000,26.5,20,4
+261,Nanda Manurung,corporate,11,2025-04-01,2026-06-30,212742000,27.6,0,8
+60,Bella Saputra,reseller,12,2025-01-10,2026-05-09,210382000,26.2,52,5
+6,Indra Halim,reseller,12,2025-01-04,2026-05-06,205908000,25.5,55,6
+130,Wahyu Siregar,reseller,10,2025-05-28,2026-04-01,190273000,30.6,90,7
+34,Arif Hartono,reseller,15,2025-01-27,2026-04-25,189856000,28.5,66,8
+49,Kirana Rahmawati,reseller,12,2025-03-08,2026-05-12,189443000,28.8,49,9
+217,Candra Setiawan,reseller,11,2025-06-22,2026-06-18,172930000,27.2,12,10
+11,Citra Santoso,corporate,6,2025-04-24,2025-12-27,161951000,29.3,185,9
+177,Kirana Siregar,reseller,12,2025-04-21,2026-04-21,157784000,26.1,70,11

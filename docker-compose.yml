@@ -1,0 +1,19 @@
+# One command to get the case study database running:
+#   docker compose up -d
+# It listens on port 5433 so it cannot collide with a PostgreSQL you installed yourself.
+services:
+  db:
+    image: postgres:16
+    container_name: nusantara-db
+    environment:
+      POSTGRES_USER: nusantara
+      POSTGRES_PASSWORD: nusantara
+      POSTGRES_DB: nusantara
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./sql/02_seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+      - nusantara_data:/var/lib/postgresql/data
+volumes:
+  nusantara_data:

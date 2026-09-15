@@ -1,0 +1,38 @@
+name: SQL check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  solutions:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nusantara
+          POSTGRES_PASSWORD: nusantara
+          POSTGRES_DB: nusantara
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load schema and data
+        env:
+          PGPASSWORD: nusantara
+        run: |
+          psql -h localhost -U nusantara -d nusantara -v ON_ERROR_STOP=1 -q -f sql/01_schema.sql
+          psql -h localhost -U nusantara -d nusantara -v ON_ERROR_STOP=1 -q -f sql/02_seed.sql
+
+      - name: Run the reference solutions against expected results
+        env:
+          DATABASE_URL: postgres://nusantara:nusantara@localhost:5432/nusantara
+        run: bash scripts/check.sh answers
