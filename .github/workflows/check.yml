@@ -32,7 +32,7 @@ jobs:
           psql -h localhost -U nusantara -d nusantara -v ON_ERROR_STOP=1 -q -f sql/01_schema.sql
           psql -h localhost -U nusantara -d nusantara -v ON_ERROR_STOP=1 -q -f sql/02_seed.sql
 
-      - name: Run the reference solutions against expected results
+      - name: Check my answers against expected results
         env:
           DATABASE_URL: postgres://nusantara:nusantara@localhost:5432/nusantara
         run: bash scripts/check.sh answers

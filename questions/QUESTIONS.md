@@ -1,6 +1,6 @@
 # Questions
 
-Twenty eight tasks on the Nusantara Living database. Write your query in the matching file under `answers/`, then run the checker (see the README).
+Twenty eight tasks on the Nusantara Living database. Write your query in the matching file under `answers/`, then run the checker (see SETUP.md).
 
 Rules used everywhere unless a task says otherwise:
 

@@ -1,15 +1,21 @@
 # Nusantara Living: a finance analytics case study in PostgreSQL
 
-A finance analytics case on a made-up Indonesian home and living retailer: 18 months of orders,
-four warehouses, monthly targets, and 28 questions that go from `SELECT` to a full board report.
+Nusantara Living is a made-up online home and living retailer in Indonesia. The dataset is synthetic: 18 months of orders (January 2025 to June 2026) shipped from four warehouses, with a monthly revenue target for each warehouse. I answered 28 finance questions about it in PostgreSQL, from simple aggregation up to a monthly board report in a single query. Every answer is checked against its expected output on each push.
 
-The repository holds the database, the questions, my answers, and a script that checks each answer
-against the expected result.
+## What the queries show
 
-- The business and the tables: [CASE.md](CASE.md)
-- The 28 tasks: [questions/QUESTIONS.md](questions/QUESTIONS.md)
-- My answers: [`answers/`](answers)
-- Query output, question by question: [RESULTS.md](RESULTS.md)
+- **Growth below target.** Net revenue in the first half of 2026 was Rp6.20 billion, 43% more than in the first half of 2025, yet only 94.8% of target. The four warehouses hit their monthly target in 6 of 24 warehouse-months, and in only 3 of 20 after January. (tasks 20 and 26)
+- **Margin dips.** Gross margin stayed between 27.8% and 29.7% in 15 of the 18 months. It fell to 25.1% in March 2025, 24.6% in December 2025 and 22.3% in March 2026, the month with the most orders (195). (task 27)
+- **Makassar.** Makassar cancels 11.5% of its orders, against 5.3% in Jakarta, and 7.8% of its non-cancelled orders are returned, the highest return rate of the four warehouses. (task 13)
+- **Repeat buyers.** In the first half of 2026, 767 of the 836 orders that were not cancelled or returned came from customers who had ordered before. First orders from new customers ran at 8 to 15 a month. (task 25)
+
+## Where to look
+
+- [RESULTS.md](RESULTS.md): each question, my query and the table it returns
+- [answers/27_board_report.sql](answers/27_board_report.sql): orders, net revenue, gross margin, cancellation rate, running revenue and month-over-month growth for every month, in one query
+- [answers/26_target_vs_actual.sql](answers/26_target_vs_actual.sql): each warehouse's monthly revenue against its target, with achievement percentage and Hit or Miss
+- [answers/28_customer_file.sql](answers/28_customer_file.sql): the 20 biggest customers with order count, margin, days since last order and rank within their segment
+- [CASE.md](CASE.md): the business, the tables and the questions finance asks every month
 
 ## What the tasks cover
 
@@ -22,70 +28,25 @@ against the expected result.
 | E. CTEs and window functions | 20 to 26 | WITH, running totals, RANK, PARTITION BY, moving average, LAG, ROW_NUMBER |
 | F. Put it together | 27 and 28 | a monthly board report and a top customer file |
 
-# Setup
+## How the answers are checked
 
-How to load the Nusantara Living database and run the queries yourself. There are two ways; pick one.
+Each task has an expected result in `expected/`. `scripts/check.sh` (or `scripts/check.ps1` on Windows) runs every file in `answers/` against the database and compares its output with the expected CSV as text, so column names, column order, row order and rounding all have to match. GitHub Actions runs the same check against a fresh PostgreSQL 16 database on every push. RESULTS.md is generated from `answers/` by `scripts/build_results.ps1`.
 
-## Option A: Docker
+## Run it yourself
 
-The compose file starts PostgreSQL 16 on port 5433 and loads the schema and the data on first start. Port 5433 keeps it clear of a local PostgreSQL, which uses 5432.
+Docker or a local PostgreSQL 16 both work. The steps are in [SETUP.md](SETUP.md).
 
-```powershell
-cd path\to\nusantara-living-sql
-docker compose up -d
-docker compose logs -f db        # wait for "database system is ready to accept connections", then Ctrl+C
+## Folder map
+
+```
+sql/         schema, seed data and a load check
+questions/   the 28 tasks and the rules they share
+answers/     my queries, one file per task
+expected/    the expected output of each task, as CSV
+scripts/     the checker and the RESULTS.md builder, in PowerShell and Bash
+tools/       the Python script that generated the synthetic data
 ```
 
-Connection details: host `localhost`, port `5433`, database `nusantara`, user `nusantara`, password `nusantara`.
+## About the data
 
-Open a SQL prompt inside the container:
-
-```powershell
-docker exec -it nusantara-db psql -U nusantara -d nusantara
-```
-
-Stop it with `docker compose stop` and start it again with `docker compose start`. `docker compose down -v` wipes the data, which then reloads from scratch on the next start.
-
-## Option B: a local PostgreSQL 16
-
-`psql` lives in `C:\Program Files\PostgreSQL\16\bin`. Add that folder to PATH once, or use the full path as below.
-
-```powershell
-cd path\to\nusantara-living-sql
-$env:PGPASSWORD = "your-postgres-password"
-& "C:\Program Files\PostgreSQL\16\bin\createdb.exe" -U postgres nusantara
-& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U postgres -d nusantara -f sql\01_schema.sql
-& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U postgres -d nusantara -f sql\02_seed.sql
-```
-
-Loading takes a few seconds. Check that it worked; the expected row counts are listed at the top of the file:
-
-```powershell
-& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U postgres -d nusantara -f sql\03_sanity_check.sql
-```
-
-With this option the connection string is `postgres://postgres:your-postgres-password@localhost:5432/nusantara`. Pass it to the scripts with `-Db`.
-
-## Running the queries
-
-Any PostgreSQL client works. In VS Code, the SQLTools extension with the SQLTools PostgreSQL/Cockroach Driver runs the open file with Ctrl+E Ctrl+E. pgAdmin ships with the PostgreSQL installer and connects to either option.
-
-## Checking the answers
-
-```powershell
-# Docker database
-.\scripts\check.ps1
-
-# local PostgreSQL
-.\scripts\check.ps1 -Db "postgres://postgres:your-postgres-password@localhost:5432/nusantara"
-```
-
-Each task prints PASS, DIFF, TODO or ERROR. DIFF means the query ran but its rows differ from `expected/`. The full output is saved in `.out\<task number>.csv`, so the two files can be compared side by side. On Linux or macOS, `bash scripts/check.sh answers` does the same, with the connection string in `DATABASE_URL`.
-
-## Rebuilding RESULTS.md
-
-```powershell
-.\scripts\build_results.ps1
-```
-
-This runs every file in `answers/` and rewrites RESULTS.md with the question, the query and the table it returns.
+The data is synthetic and generated with a fixed seed, so the expected results stay valid. Some patterns are built into the generator on purpose; they are listed at the top of [tools/generate_seed.py](tools/generate_seed.py). Nusantara Living is not a real company.
